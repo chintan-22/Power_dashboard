@@ -3,8 +3,6 @@ assignment.db
 *.sqlite
 *.sqlite3
 
-data/
-
 __pycache__/
 *.py[cod]
 .DS_Store

@@ -340,6 +340,18 @@ streamlit run app.py
 
 The dashboard expects the `data/` folder to exist. If files are missing, it will show a clear instruction to run `python preprocess.py --force`.
 
+### Deployment Note
+
+This is a Streamlit application, so deploy it on Streamlit Community Cloud, Render, Railway, or another host that can run a long-lived Python web process. Vercel is designed for static and serverless web apps and is not a good fit for this Streamlit dashboard.
+
+For Streamlit Community Cloud:
+- Repository: `chintan-22/Power_dashboard`
+- Branch: `main`
+- Main file path: `app.py`
+- Python dependencies: `requirements.txt`
+
+The raw `assignment.db` file is intentionally ignored because it is too large for GitHub. The preprocessed `data/` analytics files are included so the hosted dashboard can load without the raw database.
+
 ### Files Created
 
 - `data/matched_generation.parquet`

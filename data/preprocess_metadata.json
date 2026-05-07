@@ -1,0 +1,25 @@
+{
+  "preprocessing_timestamp": "2026-05-07T01:31:29.866506+00:00",
+  "source_database_path": "/Users/chintanshah/Documents/Durable_Task/durable_power_dashboard/assignment.db",
+  "source_database_file_size": 905416704,
+  "matched_row_count": 1978813,
+  "output_file_names": [
+    "matched_generation.parquet",
+    "daily_summary.parquet",
+    "weekly_summary.parquet",
+    "monthly_summary.parquet",
+    "plant_summary.parquet",
+    "device_summary.parquet",
+    "fuel_summary.parquet",
+    "data_quality_summary.csv",
+    "preprocess_metadata.json"
+  ],
+  "date_min": "2025-01-01",
+  "date_max": "2025-12-31",
+  "number_of_unique_devices": 300,
+  "number_of_unique_plants": 91,
+  "number_of_fuel_types": 10,
+  "chunk_size_used": 100000,
+  "pipeline_version": "1.1.0",
+  "output_directory": "/Users/chintanshah/Documents/Durable_Task/durable_power_dashboard/data"
+}
