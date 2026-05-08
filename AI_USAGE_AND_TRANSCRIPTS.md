@@ -55,13 +55,13 @@ This section summarizes the main AI-assisted interactions by topic. Full verbati
 
 ### Assignment Understanding
 
-- AI Tool Used: ChatGPT / GPT
+- AI Tool Used: ChatGPT 
 - Type of Help Requested: Clarify project expectations, identify required dashboard outputs, and interpret the assignment focus.
 - Outcome: Established that the dashboard needed to compare actual vs forecast generation, calculate forecast error metrics, include data quality checks, and provide a clear explanation of metric choices and validation.
 
 ### Database Exploration
 
-- AI Tool Used: ChatGPT / GPT and OpenAI Codex
+- AI Tool Used: ChatGPT and OpenAI Codex
 - Type of Help Requested: Explore the SQLite database structure, identify relevant tables and columns, and understand row counts, missing values, and data quality issues.
 - Outcome: Confirmed the source tables `actual_gen` and `forecast_gen`, identified the shared schema, checked row counts, reviewed missing plant/fuel metadata, and confirmed that actual and forecast records should be matched by `DATE_TIME` and `DEVICE_ID`.
 
@@ -85,7 +85,7 @@ This section summarizes the main AI-assisted interactions by topic. Full verbati
 
 ### KPI and Metric Explanation
 
-- AI Tool Used: ChatGPT / GPT and OpenAI Codex
+- AI Tool Used: ChatGPT and OpenAI Codex
 - Type of Help Requested: Explain MAE, RMSE, Bias, MAPE, WAPE, and Energy Accuracy clearly for this electricity generation dataset.
 - Outcome: Added KPI cards, hover tooltips, and documentation explaining how each metric is calculated and why it is useful. The final documentation explains that WAPE-based Energy Accuracy is more stable than MAPE because the dataset contains many zero or near-zero generation records.
 
@@ -103,13 +103,13 @@ This section summarizes the main AI-assisted interactions by topic. Full verbati
 
 ### Report Writing
 
-- AI Tool Used: ChatGPT / GPT and OpenAI Codex
+- AI Tool Used: ChatGPT and OpenAI Codex
 - Type of Help Requested: Draft clear project documentation, describe pipelines, explain design choices, and prepare the AI usage disclosure.
 - Outcome: Created detailed project documentation describing the dashboard, preprocessing pipeline, SQL design, metric choices, data quality checks, deployment setup, and the role of AI assistance.
 
 ### Video Walkthrough Preparation
 
-- AI Tool Used: ChatGPT / GPT
+- AI Tool Used: ChatGPT
 - Type of Help Requested: Prepare talking points for explaining the dashboard, preprocessing pipeline, metric choices, SQL validation, and deployment decisions.
 - Outcome: Generated a structured explanation that can be used for a project walkthrough, including how to discuss the dashboard tabs, KPIs, data quality checks, preprocessing layer, and AI usage disclosure.
 
@@ -123,17 +123,6 @@ Tool Used: OpenAI Codex
 
 Purpose: Design and implement a preprocessing pipeline that converts raw SQLite actual/forecast generation data into dashboard-ready Parquet analytics files.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
 
 ### Prompt 2: Debug preprocess.py
 
@@ -141,35 +130,11 @@ Tool Used: OpenAI Codex
 
 Purpose: Review and debug `preprocess.py`, validate SQL join logic, confirm January forecast totals, and ensure summary files match the matched dataset.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
-
 ### Prompt 3: Add Activity Threshold to Rankings
 
 Tool Used: OpenAI Codex
 
 Purpose: Fix ranking behavior so inactive or tiny low-activity records do not appear incorrectly as top performers.
-
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
 
 ### Prompt 4: Add Electric Power Grid Theme
 
@@ -177,35 +142,11 @@ Tool Used: OpenAI Codex
 
 Purpose: Upgrade the Streamlit dashboard with a professional electric utility control-room visual theme.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
-
 ### Prompt 5: Add KPI Hover Tooltips
 
 Tool Used: OpenAI Codex
 
 Purpose: Add hover explanations to KPI cards for Total Actual, Total Forecast, MAE, RMSE, Bias, and Energy Accuracy.
-
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
 
 ### Prompt 6: Deployment Configuration
 
@@ -213,35 +154,11 @@ Tool Used: OpenAI Codex
 
 Purpose: Prepare the repository for Streamlit Cloud, Render, and limited Vercel compatibility while preserving the working local dashboard.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
-
 ### Prompt 7: Documentation/Report Generation
 
 Tool Used: OpenAI Codex
 
 Purpose: Generate detailed project documentation, summarize completed pipelines, disclose AI usage, and prepare the final report materials.
-
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
 
 ## ChatGPT / GPT Prompt History
 
@@ -253,53 +170,17 @@ Tool Used: ChatGPT / GPT
 
 Purpose: Understand the assignment requirements and identify important dashboard deliverables.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
-
 ### Prompt B: Report Writing Support
 
 Tool Used: ChatGPT / GPT
 
 Purpose: Improve explanations for metrics, data quality, preprocessing design, and final submission narrative.
 
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
-
 ### Prompt C: Video Walkthrough Script
 
 Tool Used: ChatGPT / GPT
 
 Purpose: Prepare a concise project walkthrough script covering the dashboard, pipeline, validation, and deployment.
-
-Prompt:
-
-```text
-[Paste prompt here]
-```
-
-Outcome:
-
-```text
-[Paste outcome or transcript excerpt here]
-```
 
 ## Final AI Usage Statement
 
