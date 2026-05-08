@@ -21,24 +21,35 @@ The dashboard uses a custom electric power grid theme with dark utility-control 
 
 ```
 durable_power_dashboard/
-├── app.py                 # Main Streamlit dashboard application
-├── utils.py              # Utility functions for data processing
-├── data_exploration.py   # Database exploration and statistics script
-├── requirements.txt      # Python dependencies
-├── README.md            # This file
-└── assignment.db        # SQLite database (should be in parent directory)
+├── app.py                         # Main Streamlit dashboard application
+├── streamlit_app.py               # Streamlit Cloud entrypoint wrapper
+├── utils.py                       # Data loading, filtering, metrics, rankings
+├── charts.py                      # Reusable Plotly chart builders
+├── styles.py                      # Custom dashboard theme and card helpers
+├── preprocess.py                  # SQL-to-Parquet preprocessing pipeline
+├── data_exploration.py            # Database exploration and statistics script
+├── data_cleaner.py                # Supporting data quality utilities
+├── data/                          # Preprocessed Parquet analytics layer
+├── requirements.txt               # Python dependencies
+├── render.yaml                    # Render deployment configuration
+├── vercel.json                    # Vercel compatibility configuration
+├── README.md                      # This file
+└── assignment.db                  # Local raw SQLite database, ignored by Git
 ```
 
 ## Installation
 
 ### Prerequisites
 - Python 3.8 or higher
-- SQLite database file (`assignment.db`) placed in the parent directory of this project
+- Python packages from `requirements.txt`
+- The included `data/` folder for normal dashboard use
+- Optional: local SQLite database file (`assignment.db`) in the project root if you want to rebuild the analytics layer
 
 ### Step 1: Clone or Download Project
 
 ```bash
-cd durable_power_dashboard
+git clone https://github.com/chintan-22/Power_dashboard.git
+cd Power_dashboard
 ```
 
 ### Step 2: Create Virtual Environment (Recommended)
@@ -63,6 +74,8 @@ pip install -r requirements.txt
 
 ### Build the Analytics Layer
 
+The repository includes preprocessed Parquet files in `data/`, so the dashboard can run immediately after installing dependencies. Rebuild the analytics layer only when `assignment.db` is available locally or when the raw data changes.
+
 ```bash
 python preprocess.py --db assignment.db --out data --chunksize 100000 --force
 ```
@@ -74,6 +87,14 @@ streamlit run app.py
 ```
 
 The dashboard will open in your default browser at `http://localhost:8501`
+
+## Design Choices Summary
+
+- **Matched-record analysis:** Actual and forecast records are matched with a SQL `INNER JOIN` on `DATE_TIME` and `DEVICE_ID`; unmatched records are reported in the Data Quality tab but are not used for accuracy metrics.
+- **Preprocessed analytics layer:** SQL is used to extract, validate, and join raw SQLite data once. Streamlit reads Parquet files afterward for faster filtering and charting.
+- **Bias definition:** `Bias = Actual - Forecast`. Positive bias means underforecasting; negative bias means overforecasting.
+- **Metric choice:** MAE and RMSE are shown in MW because dispatch decisions are operationally MW-based. MAPE is supporting-only due to zero and near-zero generation rows. Energy Accuracy uses WAPE for a more stable percentage-style KPI.
+- **AI disclosure:** OpenAI Codex and GPT were used as development assistants for implementation, debugging, documentation, and deployment preparation. The project owner should be prepared to explain each module and design decision.
 
 ### Explore the Database
 
@@ -168,15 +189,19 @@ Same structure as `actual_gen` but containing forecasted values.
 
 ## Error Metrics Explained
 
+### Dataset Context For Metric Choices
+
+The matched analytics layer contains 1,978,813 actual/forecast records across 300 devices. This dataset has many low-output periods: 5.35% of matched rows have exactly zero actual generation, 48.05% have exactly zero forecast generation, and more than half of the rows are near zero by absolute MW. Actual generation ranges from about -9.21 MW to 865.64 MW, while forecast generation ranges from about -1.24 MW to 835.00 MW. Because the fleet contains both very small and very large generation values, the dashboard uses MW-based metrics for operational ranking and WAPE-based Energy Accuracy for a more stable percentage-style KPI.
+
 ### Mean Absolute Error (MAE)
 - **Formula:** Average of |Actual - Forecast|
 - **Interpretation:** Lower is better. Represents average magnitude of prediction error.
-- **Use:** Quick measure of forecast accuracy without penalizing large errors as much as RMSE.
+- **Dataset-specific use:** MAE is the primary ranking metric because it stays in MW, which is easy to interpret for dispatch and operations teams. Since the dataset contains generators with a wide MW range, MAE makes it clear which devices, plants, or fuel classes are missing forecasts by meaningful energy amounts.
 
 ### Root Mean Squared Error (RMSE)
 - **Formula:** √(Average of (Actual - Forecast)²)
 - **Interpretation:** Lower is better. Penalizes larger errors more heavily.
-- **Use:** When large errors are particularly costly.
+- **Dataset-specific use:** RMSE is useful because the data includes occasional large misses, with absolute errors reaching more than 800 MW. When RMSE is much higher than MAE, it signals that the forecast is usually reasonable but sometimes misses badly, which matters for reliability planning and dispatch risk.
 
 ### Bias
 - **Formula:** Average of (Actual - Forecast)
@@ -184,19 +209,24 @@ Same structure as `actual_gen` but containing forecasted values.
   - **Positive bias:** Underforecasting (actual > forecast on average)
   - **Negative bias:** Overforecasting (forecast > actual on average)
   - **Zero bias:** On average, forecast matches actual
-- **Use:** Understand systematic forecast tendency.
+- **Dataset-specific use:** Bias matters for power dispatch because direction is as important as size. Persistent underforecasting can leave operators short of expected generation, while persistent overforecasting can make planned supply look stronger than reality. In this dataset, the overall matched-record bias is negative, which indicates a tendency toward overforecasting in the selected full dataset.
 
 ### Mean Absolute Percentage Error (MAPE)
 - **Formula:** Average of |Actual - Forecast| / |Actual| × 100
 - **Interpretation:** Error as percentage of actual value.
 - **Note:** Only calculated for non-zero actual values to avoid division errors.
-- **Use:** Normalize errors across different generation scales.
+- **Dataset-specific use:** MAPE is treated as supporting information rather than the main KPI because more than half of the matched records are near zero by absolute actual MW. Percentage errors can become unstable or misleading when actual generation is zero or very small.
+
+### Weighted Absolute Percentage Error (WAPE) and Energy Accuracy
+- **Formula:** WAPE = SUM(|Actual - Forecast|) / SUM(|Actual|)
+- **Energy Accuracy:** 100 - WAPE
+- **Dataset-specific use:** WAPE is more stable than MAPE for this generation dataset because it compares total absolute error against total generation magnitude. This avoids letting many near-zero records dominate the dashboard's main percentage-style accuracy KPI.
 
 ## Data Quality Assumptions & Decisions
 
 ### Missing Value Handling
 1. **PLANT_NAME/FUEL_TYPE:** Filled with 'Unknown Plant' / 'Unknown Fuel' for analysis
-2. **GEN_MW (Generation):** Missing values filled with 0 (conservative assumption)
+2. **GEN_MW (Generation):** Raw generation values are preserved in the preprocessing layer and missing generation counts are reported in data quality outputs
 3. **Analysis:** All analysis performed on matched records (where both actual and forecast exist)
 
 ### Data Matching
@@ -242,7 +272,7 @@ Same structure as `actual_gen` but containing forecasted values.
 ### Filter Logic
 - All filters use **AND** logic
 - Leave filter empty to include all values
-- Dashboard updates in real-time as filters change
+- Dashboard updates after clicking **Apply Filters**, which prevents unnecessary reloads while several filters are being changed
 - Filtered results show in sidebar and all tabs
 
 ## Performance Notes
@@ -320,6 +350,33 @@ pip install -r requirements.txt --upgrade
 ## Preprocessing Pipeline and Analytics Layer
 
 The dashboard now uses a production-style preprocessing step so Streamlit does not repeatedly join and clean the raw SQLite tables during interaction.
+
+### SQL Querying Design Choice
+
+The assignment requirement to query the data with SQL is met inside `preprocess.py`. The pipeline connects to `assignment.db`, checks the SQLite tables, creates indexes, and runs a SQL `INNER JOIN` query on `DATE_TIME` and `DEVICE_ID` to create the matched actual/forecast dataset. The Streamlit dashboard then reads the resulting Parquet files so interactive filtering stays fast.
+
+This design intentionally separates SQL extraction from dashboard interaction:
+
+- SQL is used for the raw data join, validation checks, row counts, duplicate checks, and data quality queries.
+- Parquet is used after preprocessing because it is faster for repeated dashboard reads.
+- The dashboard still analyzes only records produced by the SQL inner join.
+
+The core SQL join is:
+
+```sql
+SELECT
+    a.DATE_TIME,
+    a.MARKET_DATE,
+    a.DEVICE_ID,
+    COALESCE(a.PLANT_NAME, f.PLANT_NAME, 'Unknown Plant') AS PLANT_NAME,
+    COALESCE(a.FUEL_TYPE, f.FUEL_TYPE, 'Unknown Fuel') AS FUEL_TYPE,
+    a.GEN_MW AS ACTUAL_MW,
+    f.GEN_MW AS FORECAST_MW
+FROM actual_gen a
+INNER JOIN forecast_gen f
+    ON a.DATE_TIME = f.DATE_TIME
+   AND a.DEVICE_ID = f.DEVICE_ID;
+```
 
 ### Why This Was Added
 

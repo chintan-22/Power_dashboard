@@ -42,6 +42,13 @@ OUTPUT_FILES = [
 ]
 
 
+# Core SQL extraction query.
+#
+# This is the primary SQL work for the assignment: it joins the two raw SQLite
+# tables into a matched actual/forecast dataset. The dashboard intentionally
+# uses only records that exist in both tables, so this must remain an INNER JOIN
+# on DATE_TIME + DEVICE_ID. The resulting Parquet layer is an optimization on
+# top of this SQL query, not a replacement for the SQL extraction requirement.
 JOIN_QUERY = """
 SELECT
     a.DATE_TIME AS DATE_TIME,
@@ -243,6 +250,9 @@ def write_matched_parquet(
 
     try:
         for chunk_number, chunk in enumerate(
+            # Execute the SQL join in chunks so the pipeline can process the
+            # large SQLite result set without loading every matched row into
+            # memory at once.
             pd.read_sql_query(JOIN_QUERY, conn, chunksize=chunksize),
             start=1,
         ):
@@ -518,6 +528,11 @@ def scalar(conn: sqlite3.Connection, query: str) -> int:
 
 
 def write_data_quality_summary(conn: sqlite3.Connection, out_path: Path) -> None:
+    # These SQL validation queries make the raw-data audit trail explicit.
+    # They verify row counts, matched/unmatched records, duplicate keys,
+    # missing metadata, negative generation, capacity issues, and status mixes
+    # directly against the SQLite source tables before the dashboard reads
+    # the optimized Parquet layer.
     rows = [
         ("actual_row_count", scalar(conn, "SELECT COUNT(*) FROM actual_gen")),
         ("forecast_row_count", scalar(conn, "SELECT COUNT(*) FROM forecast_gen")),

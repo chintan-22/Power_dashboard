@@ -38,6 +38,8 @@ OpenAI Codex and GPT were used during this project as development assistants. Th
 
 The final implementation decisions, project direction, data definitions, and dashboard requirements were controlled by the project owner. Codex and GPT were used as productivity tools to accelerate development and improve code quality.
 
+For interviews or review discussions, the project owner should be ready to explain the full workflow independently: how the SQL inner join is performed, why matched records are used, why Parquet was introduced, how each metric is calculated, why WAPE is more stable than MAPE for this dataset, how ranking activity filters work, and why Streamlit Cloud or Render is a better fit than Vercel for this dashboard.
+
 ## 3. Main Project Goals
 
 The project started as a working Streamlit dashboard and was improved into a more production-style analytics dashboard.
@@ -81,7 +83,11 @@ WAPE = total absolute error / total actual generation magnitude
 Energy Accuracy = 100 - WAPE
 ```
 
-MAPE is shown as supporting information only because generation data can contain zero or very small actual values, which makes MAPE unstable. Energy Accuracy based on WAPE was added because it is more stable for this kind of electricity generation data.
+The metric choices were driven by the characteristics of this specific matched dataset. The analytics layer contains 1,978,813 matched records across 300 devices. Exactly zero actual generation appears in 105,964 rows, or 5.35% of the matched data, while zero forecast generation appears in 950,797 rows, or 48.05% of the matched data. More than half of the records are near zero by absolute MW, which makes percentage-only metrics unstable.
+
+The MW range is also wide. Actual generation ranges from about -9.21 MW to 865.64 MW, and forecast generation ranges from about -1.24 MW to 835.00 MW. For that reason, MAE is useful as the primary ranking metric because it remains in MW and is easy for power operations users to interpret. RMSE is included because occasional large misses matter for dispatch reliability and reserve planning; if RMSE is much higher than MAE, the forecast has high-impact outliers.
+
+Bias is included because power dispatch decisions depend not only on error size but also on error direction. Persistent positive bias means the forecast was too low and actual generation exceeded expectations. Persistent negative bias means the forecast was too high and planned supply may look stronger than reality. MAPE is shown as supporting information only because generation data contains many zero or very small actual values. Energy Accuracy based on WAPE was added because it is more stable for this kind of electricity generation data.
 
 ## 5. Current Repository Structure
 
@@ -184,6 +190,14 @@ Before preprocessing, the dashboard had to repeatedly:
 - Aggregate results.
 
 After preprocessing, the dashboard reads ready-to-use Parquet files.
+
+### 8.1.1 SQL Requirement And Design Choice
+
+The assignment requirement to query the data with SQL is addressed in the preprocessing layer. `preprocess.py` connects directly to the SQLite database, confirms the required tables exist, creates SQL indexes, runs the SQL inner join, and uses additional SQL queries for row counts, duplicate checks, unmatched-record checks, negative generation checks, capacity checks, and status distributions.
+
+The dashboard does not repeatedly issue large SQL joins during user interaction because that would make filtering slower. Instead, SQL is used where it is strongest: extracting and validating the raw relational data. The cleaned matched result is then saved as Parquet so Streamlit can read an optimized analytics layer quickly.
+
+This means the project still uses real SQL work, but it uses SQL in a production-style extract/preprocess step rather than forcing every dashboard interaction to repeat the same expensive database join.
 
 ### 8.2 Pipeline Inputs
 
