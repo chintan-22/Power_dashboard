@@ -436,7 +436,7 @@ Parquet is columnar, compressed, and much faster for dashboard reads than repeat
 ## Contact & Support
 
 For questions or issues with this dashboard, contact:
-- **Organization:** Durable Electric Power, LLC
+- **Maintainer:** Chintan Shah
 - **Date Created:** May 5, 2026
 
 ## License
