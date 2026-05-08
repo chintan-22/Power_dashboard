@@ -254,7 +254,7 @@ def utilization_vs_error_scatter(df: pd.DataFrame):
         color="FUEL_TYPE",
         color_discrete_map=FUEL_COLORS,
         hover_data=["PLANT_NAME", "total_actual_mw"],
-        title="Capacity Utilization vs Forecast Error",
+        title=None,
         labels={
             "avg_capacity_utilization": "Avg Utilization (%)",
             "mae": "MAE (MW)",
@@ -264,19 +264,12 @@ def utilization_vs_error_scatter(df: pd.DataFrame):
     )
     fig = apply_power_grid_layout(
         fig,
-        title="Capacity Utilization vs Forecast Error",
-        height=500,
+        title="",
+        height=470,
     )
     fig.update_layout(
-        title=dict(
-            text="Capacity Utilization vs Forecast Error",
-            x=0,
-            xanchor="left",
-            y=0.97,
-            yanchor="top",
-            font=dict(color=THEME["text"], size=18),
-        ),
-        margin=dict(l=56, r=24, t=82, b=140),
+        title=None,
+        margin=dict(l=56, r=24, t=28, b=140),
         legend=dict(
             title=dict(text="Fuel Type", font=dict(color=THEME["text_secondary"])),
             orientation="h",

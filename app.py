@@ -683,6 +683,7 @@ with tab4:
 
     col1, col2 = st.columns(2)
     with col1:
+        st.markdown("#### Generation Mix by Fuel Type")
         fuel_mix = (
             filtered_df.groupby("FUEL_TYPE", as_index=False)
             .agg(total_actual_mw=("ACTUAL_MW", "sum"))
@@ -694,7 +695,7 @@ with tab4:
             names="FUEL_TYPE",
             color="FUEL_TYPE",
             color_discrete_map=charts.FUEL_COLORS,
-            title="Generation Mix by Fuel Type",
+            title=None,
         )
         fig_pie.update_traces(
             marker=dict(line=dict(color="rgba(248,250,252,0.18)", width=1)),
@@ -702,19 +703,12 @@ with tab4:
         )
         fig_pie = charts.apply_power_grid_layout(
             fig_pie,
-            title="Generation Mix by Fuel Type",
-            height=500,
+            title="",
+            height=470,
         )
         fig_pie.update_layout(
-            title=dict(
-                text="Generation Mix by Fuel Type",
-                x=0,
-                xanchor="left",
-                y=0.97,
-                yanchor="top",
-                font=dict(color=styles.THEME["text"], size=18),
-            ),
-            margin=dict(l=24, r=24, t=82, b=140),
+            title=None,
+            margin=dict(l=24, r=24, t=28, b=140),
             legend=dict(
                 title=dict(text="Fuel Type", font=dict(color=styles.THEME["text_secondary"])),
                 orientation="h",
@@ -730,6 +724,7 @@ with tab4:
         st.caption("Fuel mix shows how total actual generation is distributed by resource type.")
 
     with col2:
+        st.markdown("#### Capacity Utilization vs Forecast Error")
         st.plotly_chart(
             charts.utilization_vs_error_scatter(filtered_df),
             use_container_width=True,
