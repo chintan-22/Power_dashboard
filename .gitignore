@@ -4,5 +4,10 @@ assignment.db
 *.sqlite3
 
 __pycache__/
+*.pyc
 *.py[cod]
 .DS_Store
+.venv/
+.env
+.ipynb_checkpoints/
+csv_exports/

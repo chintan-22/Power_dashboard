@@ -391,3 +391,32 @@ Internal use only - Durable Electric Power, LLC
 **Dashboard Version:** 1.0  
 **Last Updated:** May 5, 2026
 # Power_dashboard
+
+## Deployment Notes
+
+Local run:
+
+```bash
+streamlit run app.py
+```
+
+Preprocessing:
+
+```bash
+python preprocess.py --force
+```
+
+Recommended deployment:
+
+- Streamlit Community Cloud
+- Render
+
+Render start command:
+
+```bash
+streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+```
+
+Vercel note:
+
+Vercel may detect Python entrypoints, but Streamlit is not a standard Vercel Python serverless app. Streamlit runs a persistent web server, while Vercel expects serverless Python/ASGI/WSGI style apps. If Vercel fails, deploy on Streamlit Community Cloud or Render.
