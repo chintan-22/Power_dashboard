@@ -131,7 +131,7 @@ def error_histogram(df: pd.DataFrame):
 def actual_vs_forecast_scatter(df: pd.DataFrame, sample_size: int = 3000):
     """Actual vs forecast scatter plot with a perfect forecast reference line."""
     if df.empty:
-        return apply_power_grid_layout(go.Figure(), title="Actual vs Forecasted Generation")
+        return apply_power_grid_layout(go.Figure(), title="")
 
     plot_df = df.sample(min(sample_size, len(df)), random_state=42)
     fig = px.scatter(
@@ -141,7 +141,7 @@ def actual_vs_forecast_scatter(df: pd.DataFrame, sample_size: int = 3000):
         color="FUEL_TYPE",
         color_discrete_map=FUEL_COLORS,
         hover_data=["DEVICE_ID", "PLANT_NAME"],
-        title="Actual vs Forecasted Generation",
+        title=None,
         labels={"FORECAST_MW": "Forecast (MW)", "ACTUAL_MW": "Actual (MW)"},
         opacity=0.62,
     )
@@ -156,7 +156,22 @@ def actual_vs_forecast_scatter(df: pd.DataFrame, sample_size: int = 3000):
             hovertemplate="Perfect Forecast<extra></extra>",
         )
     )
-    return apply_power_grid_layout(fig, height=430)
+    fig = apply_power_grid_layout(fig, title="", height=500)
+    fig.update_layout(
+        title=None,
+        margin=dict(l=56, r=24, t=28, b=150),
+        legend=dict(
+            title=dict(text="Fuel Type", font=dict(color=THEME["text_secondary"])),
+            orientation="h",
+            yanchor="top",
+            y=-0.24,
+            xanchor="left",
+            x=0,
+            bgcolor="rgba(0,0,0,0)",
+            font=dict(color=THEME["text_secondary"]),
+        ),
+    )
+    return fig
 
 
 def error_by_fuel_bar(df: pd.DataFrame):

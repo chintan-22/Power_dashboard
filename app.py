@@ -599,6 +599,7 @@ with tab2:
 
     col1, col2 = st.columns(2)
     with col1:
+        st.markdown("#### Actual vs Forecasted Generation")
         st.plotly_chart(
             charts.actual_vs_forecast_scatter(filtered_df),
             use_container_width=True,
