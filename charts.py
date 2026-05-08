@@ -262,4 +262,30 @@ def utilization_vs_error_scatter(df: pd.DataFrame):
             "total_actual_mw": "Total Actual MW",
         },
     )
-    return apply_power_grid_layout(fig, height=430)
+    fig = apply_power_grid_layout(
+        fig,
+        title="Capacity Utilization vs Forecast Error",
+        height=500,
+    )
+    fig.update_layout(
+        title=dict(
+            text="Capacity Utilization vs Forecast Error",
+            x=0,
+            xanchor="left",
+            y=0.97,
+            yanchor="top",
+            font=dict(color=THEME["text"], size=18),
+        ),
+        margin=dict(l=56, r=24, t=82, b=140),
+        legend=dict(
+            title=dict(text="Fuel Type", font=dict(color=THEME["text_secondary"])),
+            orientation="h",
+            yanchor="top",
+            y=-0.24,
+            xanchor="left",
+            x=0,
+            bgcolor="rgba(0,0,0,0)",
+            font=dict(color=THEME["text_secondary"]),
+        ),
+    )
+    return fig

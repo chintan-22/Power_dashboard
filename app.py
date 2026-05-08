@@ -700,14 +700,33 @@ with tab4:
             marker=dict(line=dict(color="rgba(248,250,252,0.18)", width=1)),
             textfont=dict(color=styles.THEME["text"]),
         )
-        st.plotly_chart(
-            charts.apply_power_grid_layout(
-                fig_pie,
-                title="Generation Mix by Fuel Type",
-                height=430,
-            ),
-            use_container_width=True,
+        fig_pie = charts.apply_power_grid_layout(
+            fig_pie,
+            title="Generation Mix by Fuel Type",
+            height=500,
         )
+        fig_pie.update_layout(
+            title=dict(
+                text="Generation Mix by Fuel Type",
+                x=0,
+                xanchor="left",
+                y=0.97,
+                yanchor="top",
+                font=dict(color=styles.THEME["text"], size=18),
+            ),
+            margin=dict(l=24, r=24, t=82, b=140),
+            legend=dict(
+                title=dict(text="Fuel Type", font=dict(color=styles.THEME["text_secondary"])),
+                orientation="h",
+                yanchor="top",
+                y=-0.24,
+                xanchor="left",
+                x=0,
+                bgcolor="rgba(0,0,0,0)",
+                font=dict(color=styles.THEME["text_secondary"]),
+            ),
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
         st.caption("Fuel mix shows how total actual generation is distributed by resource type.")
 
     with col2:
